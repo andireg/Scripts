@@ -1,0 +1,47 @@
+name: $(Build.DefinitionName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+schedules:
+- cron: "0 6 * * *"
+  displayName: Daily 05:00 run
+  branches:
+    include:
+    - master
+  always: true
+  
+trigger: none
+
+parameters:
+- name: Organization
+  displayName: 'Name of the organization'
+  type: string
+  default: {NAME-OF-THE-ORGANIZATION}
+- name: Project
+  displayName: 'Name of the project'
+  type: string
+  default: {NAME-OF-THE-PROJECT}
+- name: DashboardId
+  displayName: 'Id of the dashboard'
+  type: string
+  default: {GUID-OF-THE-DASHBOARD}
+- name: DetailWidgetId
+  displayName: 'Id of the detail widget'
+  type: string
+  default: {GUID-OF-THE-WIDGET}
+- name: DetailWikiPage
+  displayName: 'Path of the wiki page'
+  type: string
+  default: {RELATIVE-PATH-OF-THE-WIKI-PAGE}
+- name: TeamsWebhook
+  displayName: 'Webhook of MS Teams connector'
+  type: string
+  default: {URI-OF-THE-WEBHOOK}
+
+jobs:
+  - job: MonitorBuildPipelines
+    displayName: MonitorBuildPipelines
+    steps:
+    - task: PowerShell@1
+      displayName: 'Check build pipelines'
+      inputs:
+        scriptName: '$(Build.SourcesDirectory)\check-build-pipelines.ps1'
+        arguments: '-organization "${{ parameters.Organization }}" -project "${{ parameters.Project }}" -dashboardId "${{ parameters.DashboardId }}" -detailWidgetId "${{ parameters.DetailWidgetId }}" -detailWikiPage "${{ parameters.DetailWikiPage }}" -teamsWebhook "${{ parameters.TeamsWebhook }}" -personalAccessToken "$(PersonalAccessToken)"'    
